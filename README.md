@@ -1,9 +1,14 @@
 # covid-19-risk-map
 Data, methods and code to develop Global Corona Virus (COVID19) risk maps. Work in progress.
 
-Disclaimer: This is a very simple methodology to assess hazard risks from COVID-19 in a geographical manner.  It is by no means accurate and should not be used for policy making.
+![](images/covid-19-risk-map.png)
+
+# Disclaimer
+This is a very simple methodology to assess hazard risks from COVID-19 in a geographical manner.  It is by no means accurate and should not be used for policy making.
 
 Ideally, it should be reviewed by data scientists, geographical epidemiologists, other health professionals and policy makers to be adjusted for gaining some overall insights into the pandemic.
+
+# The Logic
 
 The logic is relatively simple and relies on the hazard risk approach. Basically, I am assuming the hazard risk = hazard magnitude x vulnerability.
 
@@ -17,7 +22,7 @@ If you go into the program, you will notice that I scale each risk component bet
 total risk = a + b + c/2
 This really is a first attempt to quantify the risk and I acknowledge there are countless factors that should ideally go into this mapping (e.g. temperatures, connectivity and human flows, existing policies, type of medical system, economics, level of social isolation etc.). 
 
-Here is the flow of the program:
+# Flow of the program
 
 1.	The program reads all the constants and file names from the covConst.py file. The outcome of the program can be changed simply by changing the variables (such as the size of the low pass filter).
 2.	The program (covid19RiskMap.py) pulls the COVID 19 data from the COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE [1].
@@ -29,6 +34,12 @@ Here is the flow of the program:
 8.	Each raster is read into a numpy array, and the calculations described above are carried out.
 9.	The result is saved as a raster named “covid-risk.tif”.
 
-References and Sources
-[1] https://github.com/CSSEGISandData/COVID-19
-[2] Lloyd, C., Sorichetta, A. & Tatem, A. High resolution global gridded data for use in population studies. Sci Data 4, 170001 (2017). https://doi.org/10.1038/sdata.2017.1
+# Visualization
+
+For the screenshots I used ArcGIS Pro, but an open source solution like QGIS can be easily deployed, as well.  I am currently working on making the visualization on Jupyter Notebooks. Ideally the user would be able to zoom into portions of the final map.
+
+![](images/zoomed-risk-map.png)
+
+# References and Sources
+1. https://github.com/CSSEGISandData/COVID-19
+2. Lloyd, C., Sorichetta, A. & Tatem, A. High resolution global gridded data for use in population studies. Sci Data 4, 170001 (2017). https://doi.org/10.1038/sdata.2017.1
