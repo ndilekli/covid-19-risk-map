@@ -1,7 +1,7 @@
 # covid-19-risk-map
 Data, methods and code to develop Global Corona Virus (COVID19) risk maps. Work in progress.
 
-![](images/covid-19-risk-map.png)
+![](images/zoomed-risk-map.png)
 
 # Disclaimer
 This is a very simple methodology to assess hazard risks from COVID-19 in a geographical manner.  It is by no means accurate and the users should be aware of the simplification in the procedures and therefore it needs to be used with care.
@@ -38,7 +38,7 @@ This really is a first attempt to quantify the risk and I acknowledge there are 
 
 For the screenshots I used ArcGIS Pro, but an open source solution like QGIS can be easily deployed, as well.  I am currently working on making the visualization on Jupyter Notebooks. Ideally the user would be able to zoom into portions of the final map.
 
-![](images/zoomed-risk-map.png)
+![](images/covid-19-risk-map.png)
 
 # References and Sources
 1. https://github.com/CSSEGISandData/COVID-19
