@@ -20,7 +20,7 @@ corDeaths = "coronaDeaths.tif"
 corDeaths_LP = "coronaDeaths_LP.tif"
 corDeaths_LP_georef = 'coronaDeaths_LP_georef.tif'
 
-ppp_2020_10km_aggregated = "ppp_2020_10km_aggregated.tif"
+ppp_2020_10km_aggregated = "ppp_2020_10km_Aggregated.tif"
 ppp_2020_10km_aggregated_aligned = "ppp_2020_10km_aggregated_aligned.tif"
 output = "covid-risk.tif"
 
