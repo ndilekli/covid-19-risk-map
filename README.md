@@ -4,7 +4,7 @@ Data, methods and code to develop Global Corona Virus (COVID19) risk maps. Work 
 ![](images/covid-19-risk-map.png)
 
 # Disclaimer
-This is a very simple methodology to assess hazard risks from COVID-19 in a geographical manner.  It is by no means accurate and should not be used for policy making.
+This is a very simple methodology to assess hazard risks from COVID-19 in a geographical manner.  It is by no means accurate and the users should be aware of the simplification in the procedures and therefore it needs to be used with care.
 
 Ideally, it should be reviewed by data scientists, geographical epidemiologists, other health professionals and policy makers to be adjusted for gaining some overall insights into the pandemic.
 
