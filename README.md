@@ -34,6 +34,26 @@ This really is a first attempt to quantify the risk and I acknowledge there are 
 8.	Each raster is read into a numpy array, and the calculations described above are carried out.
 9.	The result is saved as a raster named “covid-risk.tif”.
 
+# Setup
+The script is written in Python, and it can be run as simple as the following command, after everything else is setup:
+
+python covid19RiskMap.py
+
+There is a large number of libraries used by the script, and they need be installed either by conda or pip. Interested parties are encouraged to install [conda/Anaconda][https://docs.conda.io/projects/conda/en/latest/user-guide/install/] and setup an environment  using the following commands and the [covid-env.txt](covid-env.txt) file included in the repo. This should be the easiest setup.
+
+conda create --name covid --file covid-env.txt
+
+This command should download all the necessary libraries required to run the script.
+
+Finally run the following to obtain the “covid-risk.tif” file which includes geographic coordinates:
+
+python covid19RiskMap.py
+
+### Note
+It seems like the package "wget" needs to be installed using pip due to some version related issues
+
+pip install wget
+
 # Visualization
 
 For the screenshots I used ArcGIS Pro, but an open source solution like QGIS can be easily deployed, as well.  I am currently working on making the visualization on Jupyter Notebooks. Ideally the user would be able to zoom into portions of the final map.
