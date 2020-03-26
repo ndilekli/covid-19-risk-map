@@ -64,7 +64,7 @@ For the screenshots, ArcGIS Pro was used, but an open-source solution like QGIS 
 ![](images/covid-19-risk-map.png)
 
 # References and Sources
-1. Cutter, Susan L., Bryan J. Boruff, and W. Lynn Shirley. "Social vulnerability to environmental hazards." Hazards vulnerability and environmental justice. Routledge, 2012. 143-160.
+1. Blong, R. J. "Volcanic hazards risk assessment." Monitoring and mitigation of volcano hazards. Springer, Berlin, Heidelberg, 1996. 675-698.
 2. https://github.com/CSSEGISandData/COVID-19
 3. Lloyd, C., Sorichetta, A. & Tatem, A. High resolution global gridded data for use in population studies. Sci Data 4, 170001 (2017). https://doi.org/10.1038/sdata.2017.1
 
