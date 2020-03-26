@@ -29,28 +29,35 @@ def getCovidData():
         if item.endswith(".csv"):
             os.remove(os.path.join(os.getcwd(), item))
 
-    # Get 2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE
-    urls = ['https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv', 
-        'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv', 
-        'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv']
+    # Get 2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE 
+    # 3/26/20: Updated the links as they were changed on their GitHub repo
+    urls = ['https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv', 
+        'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv', 
+        'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv']
 
     for url in urls:
         filename = wget.download(url)
 
     # datasets
     # --------
-    conf_df = pd.read_csv('time_series_19-covid-Confirmed.csv')
-    deaths_df = pd.read_csv('time_series_19-covid-Deaths.csv')
-    recv_df = pd.read_csv('time_series_19-covid-Recovered.csv')
+    # 3/26/20: Same changes above
+    conf_df = pd.read_csv('time_series_covid19_confirmed_global.csv')
+    deaths_df = pd.read_csv('time_series_covid19_deaths_global.csv')
+    recv_df = pd.read_csv('time_series_covid19_recovered_global.csv')
 
     dates = conf_df.columns[4:]
     conf_df_long = conf_df.melt(id_vars=['Province/State', 'Country/Region', 'Lat', 'Long'], 
                                 value_vars=dates, var_name='Date', value_name='Confirmed')
     deaths_df_long = deaths_df.melt(id_vars=['Province/State', 'Country/Region', 'Lat', 'Long'], 
                                 value_vars=dates, var_name='Date', value_name='Deaths')
-    recv_df_long = recv_df.melt(id_vars=['Province/State', 'Country/Region', 'Lat', 'Long'], 
-                                value_vars=dates, var_name='Date', value_name='Recovered')
-    full_table = pd.concat([conf_df_long, deaths_df_long['Deaths'], recv_df_long['Recovered']], 
+    # 3/26/20: Commenting this out because the dates in this file are inconsistent with the previous ones
+    # And this script doesn't use recovered case information.
+    #recv_df_long = recv_df.melt(id_vars=['Province/State', 'Country/Region', 'Lat', 'Long'], 
+    #                            value_vars=dates, var_name='Date', value_name='Recovered')
+    # 3/26/20: Need to change the line below as well
+    # full_table = pd.concat([conf_df_long, deaths_df_long['Deaths'], recv_df_long['Recovered']], 
+    #                     axis=1, sort=False)
+    full_table = pd.concat([conf_df_long, deaths_df_long['Deaths']], 
                         axis=1, sort=False)
     # full_table.head()    
     # removing county wise data to avoid double counting
