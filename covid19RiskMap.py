@@ -109,10 +109,6 @@ def shp2ras(shpFile, attr, rawRaster, pixelSize, noDataValue, x_min, y_min, x_ma
     # https://pcjericks.github.io/py-gdalogr-cookbook/raster_layers.html
     # Define pixel_size and NoData value of new raster
 
-    # I think I might need to use the Pop Grid 
-    pixel_size = 0.083333333
-    NoData_value = -9999
-
     # Open the data source and read in the extent
     source_ds = ogr.Open(shpFile)
 
@@ -124,14 +120,16 @@ def shp2ras(shpFile, attr, rawRaster, pixelSize, noDataValue, x_min, y_min, x_ma
      #x_max = 180
 
     # Create the destination data source
-    x_res = int((x_max - x_min) / pixel_size)
-    y_res = int((y_max - y_min) / pixel_size)
+    x_res = int((x_max - x_min) / pixelSize)
+    y_res = int((y_max - y_min) / pixelSize)
 
     # I changed from GDT_Byte to GDT_UInt32 to make it work
     target_ds = gdal.GetDriverByName('GTiff').Create(rawRaster, x_res, y_res, 1, gdal.GDT_UInt32)
-    target_ds.SetGeoTransform((x_min, pixel_size, 0, y_max, 0, -pixel_size))
+    target_ds.SetGeoTransform((x_min, pixelSize, 0, y_max, 0, -pixelSize))
     band = target_ds.GetRasterBand(1)
-    band.SetNoDataValue(NoData_value)
+
+    # 3/27/20: If there is no value, meaning zero, that can be saved as a nodata value
+    band.SetNoDataValue(0)
 
     # How to set the spatial reference: https://gis.stackexchange.com/questions/82031/gdal-python-set-projection-of-a-raster-not-working
     srs = osr.SpatialReference()
@@ -176,6 +174,7 @@ def array2raster(newRasterfn,originX, originY,pixelSize,array):
     outRaster = driver.Create(newRasterfn, cols, rows, 1, gdal.GDT_UInt32)
     outRaster.SetGeoTransform((originX, pixelSize, 0, originY, 0, pixelSize))
     outband = outRaster.GetRasterBand(1)
+    outband.SetNoDataValue(0)
     outband.WriteArray(reversed_arr)
     outRasterSRS = osr.SpatialReference()
     outRasterSRS.ImportFromEPSG(4326)
@@ -230,11 +229,25 @@ def reproject_image_to_master ( master, slave, out, res=None ):
                                                 w, h, n_bands, data_type)
     dst_ds.SetGeoTransform( master_geotrans )
     dst_ds.SetProjection( master_proj)
-    dst_ds.GetRasterBand(1).SetNoDataValue(0)
+    print(dst_ds.GetRasterBand(1).GetNoDataValue())
+
+    # 3/27/20: Realized that need to use -9999 to correctly save the nodata pixels
+    dst_ds.GetRasterBand(1).SetNoDataValue(-9999)
 
     gdal.ReprojectImage( slave_ds, dst_ds, slave_proj, master_proj, gdal.GRA_NearestNeighbour)
     dst_ds = None  # Flush to disk
     return out
+
+# Return master_proj, master_geotrans, w, h
+def getMasterParams(master):
+    master_ds = gdal.Open( master )
+
+    master_proj = master_ds.GetProjection()
+    master_geotrans = master_ds.GetGeoTransform()
+    w = master_ds.RasterXSize
+    h = master_ds.RasterYSize
+    data_type = master_ds.GetRasterBand(1).DataType
+    return [master_proj, master_geotrans, w, h, data_type]
 
 # Convert the first band of a raster to a simple python array for raster calculations
 def raster2array(raster):
@@ -275,25 +288,44 @@ def main():
 
     # Raster to array
     pop_arr = raster2array(covConst.ppp_2020_10km_aggregated_aligned)
+    pop_arrFix = np.copy(pop_arr)
+    pop_arrFix[pop_arrFix == -9999.] = 0
     confirmed_arr = raster2array(covConst.corConfirmed_LP_georef)
     deaths_arr = raster2array(covConst.corDeaths_LP_georef)
 
+    # Create a mask https://stackoverflow.com/questions/43590825/python-numpy-replace-values-in-one-array-with-corresponding-values-in-another-a
+    mask = (pop_arr != -9999)
     # apply equation
-    par1 = confirmed_arr*pop_arr
+    par1 = confirmed_arr*pop_arrFix
     par1_std = np.interp(par1, (par1.min(), par1.max()), (0, 1000))
 
-    par2 = deaths_arr*pop_arr
+    par2 = deaths_arr*pop_arrFix
     par2_std = np.interp(par2, (par2.min(), par2.max()), (0, 1000))
 
-    par3 = pop_arr**2
+    par3 = pop_arrFix**2
     par3_std = np.interp(par3, (par3.min(), par3.max()), (0, 1000))
 
-    raster_calculation = par1_std + par2_std + par3_std / 2
-
+    raster_calculation = par1_std + par2_std + par3_std
+    # https://stackoverflow.com/questions/31943391/using-bool-array-mask-replace-false-values-with-nan
+    raster_calculation[~mask] = -9999
     # print("Max values of each parameter", par1_std.max(), par2_std.max(), par3_std.max())
 
     # save array, using corConfirmed_LP_georef as a prototype
-    gdal_array.SaveArray(raster_calculation.astype("float32"), covConst.output, "GTIFF", covConst.corConfirmed_LP_georef)
+    # gdal_array.SaveArray(raster_calculation.astype("float32"), covConst.output, "GTIFF", covConst.corConfirmed_LP_georef)
+    [master_proj, master_geotrans, w, h, data_type] = getMasterParams(covConst.corConfirmed_LP_georef)
+    outDs = gdal.GetDriverByName('GTiff').Create(covConst.output, w, h, 1, gdal.GDT_Float32)
+
+    outBand = outDs.GetRasterBand(1)
+    # outData = numpy.zeros((rows,cols), numpy.int16)
+    outBand.WriteArray(raster_calculation, 0, 0)
+    # flush data to disk, set the NoData value and calculate stats
+    outBand.FlushCache()
+    outBand.SetNoDataValue(-9999)
+    # georeference the image and set the projection
+    outDs.SetGeoTransform(master_geotrans)
+    outDs.SetProjection(master_proj)
+
+    del raster_calculation
 
 if __name__ == "__main__":
     main()
