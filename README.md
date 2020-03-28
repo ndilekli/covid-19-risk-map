@@ -1,7 +1,7 @@
 # covid-19-risk-map
 Data, methods, and code to develop Global Corona Virus (COVID19) risk maps. Work in progress.
 
-![](images/zoomed-risk-map.png)
+![](images/covid-19-risk-map-March-28-small.png)
 
 # Disclaimer
 This is a very simple methodology to assess hazard risks from COVID-19 in a geographical manner. 
